@@ -1,0 +1,6 @@
+{
+    "logging": {
+        "level": "INFO",
+        "file": "blink-block-blitz.log"
+    }
+}
