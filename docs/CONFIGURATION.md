@@ -1,0 +1,1 @@
+This file will document how to configure the game through its json file.
