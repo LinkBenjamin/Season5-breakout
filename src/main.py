@@ -69,14 +69,6 @@ def main():
             case 'new':
                 logger.debug("Matched 'new'")
                 play_game_screen(screen, config)
-            case 'load':
-                logger.debug("Matched 'load'")
-                # Initialize the game with settings from a file
-                pass
-            case 'options':
-                logger.debug("Matched 'options'")
-                # Go to the options page
-                pass
             case 'quit':
                 logger.debug("Matched 'quit'")
                 game_playing = False
