@@ -4,6 +4,11 @@
         "screen_width": 1200,
         "screen_height": 700
     },
+    "game": {
+        "background_color": [0,0,50],
+        "paddle_color": [255,255,255],
+        "default_ball_radius": 10
+    },
     "logging": {
         "level": "INFO",
         "file": "blink-block-blitz.log"
