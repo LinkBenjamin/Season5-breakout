@@ -1,6 +1,17 @@
 {
+    "app": {
+        "name": "Blink Block Blitz",
+        "screen_width": 1200,
+        "screen_height": 700
+    },
     "logging": {
         "level": "INFO",
         "file": "blink-block-blitz.log"
+    },
+    "menu": {
+        "bg_color": [0,0,0],
+        "text_color": [255,255,255],
+        "font_size": 72,
+        "font": "assets/fonts/Blox2/Blox2.ttf"
     }
 }
