@@ -32,6 +32,26 @@ class GameWindow:
         self.logger.debug("Starting first ball on the game board now...")
         self.balls[0].start_ball()
     
+    def calculate_bounce_angle(self, ball, paddle, speed, max_angle_deg=70.0):
+        paddle_center = float(paddle.centerx)
+        relative_hit = (float(ball.centerx) - paddle_center) / (float(paddle.width) / 2)
+
+        relative_hit = max(-1, min(1, relative_hit))
+        if abs(relative_hit) < 0.25:
+            relative_hit = 0
+        elif abs(relative_hit) < 0.5:
+            relative_hit = random.uniform(0.01, 0.1)
+        elif abs(relative_hit) < 0.75:
+            relative_hit = random.uniform(0.1, 0.25)
+
+        max_angle_rad = math.radians(max_angle_deg)
+        bounce_angle = relative_hit * max_angle_rad
+
+        new_vel_x = -speed * math.sin(bounce_angle)
+        new_vel_y = -speed * math.cos(bounce_angle)
+
+        return (new_vel_x, new_vel_y)
+
     def run(self):
         running = True
         pygame.mouse.set_visible(False)
@@ -56,6 +76,14 @@ class GameWindow:
             for ball in self.balls:
                 ball.update_position()
                 pygame.draw.circle(self.screen,[255,0,0],ball.rect.center, ball.radius)
+
+            if ball.rect.colliderect(self.paddle.rect):
+                self.logger.debug(f"Paddle Hit: p{self.paddle.rect.centerx}, b{ball.rect.centerx}, s{ball.speed}")
+                v_new = self.calculate_bounce_angle(self.paddle.rect, ball.rect, ball.speed)
+                self.logger.debug(f"New Velocity: {v_new}")
+                ball.vel_x = v_new[0]
+                ball.vel_y = v_new[1]
+                ball.rect.bottom = self.paddle.rect.top
 
             pygame.display.flip()
 

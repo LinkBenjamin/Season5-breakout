@@ -35,7 +35,7 @@ class Ball:
             self.bounce_x()
         
         if self.rect.top <= 0:
-            self.bounce_y
+            self.bounce_y()
     
         if self.rect.bottom >= self.screen_height:
             return True
