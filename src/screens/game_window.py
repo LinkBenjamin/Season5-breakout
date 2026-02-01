@@ -2,6 +2,7 @@ import pygame
 import logging
 from core.paddle import Paddle
 from core.ball import Ball
+from core.level import Level
 import math
 import random
 
@@ -23,6 +24,32 @@ class GameWindow:
         self.balls = []
         self.ball_radius = config.get('game',{}).get('default_ball_radius',10)
         self.balls.append(self.init_ball(self.p_height,self.ball_radius))
+        self.default_ball_color = config.get('game', {}).get('default_ball_color',[255,0,0])
+
+        self.brick_color = config.get('game', {}).get('brick_color',[100,100,100])
+        self.bricks = self.load_level(1)
+
+    def check_collision_side(self, ball, brick):
+        dr = abs(ball.right - brick.left)
+        dl = abs(ball.left - brick.right)
+        db = abs(ball.bottom - brick.top)
+        dt = abs(ball.top - brick.bottom)
+
+        min_overlap = min(dr, dl, db, dt)
+
+        if min_overlap == dr:
+            return "right"
+        if min_overlap == dl:
+            return "left"
+        if min_overlap == db:
+            return "bottom"
+        if min_overlap == dt:
+            return "top"
+
+    def load_level(self, lev):
+        self.current_level = lev
+        level = Level(lev,self.screen_width,self.screen_height)
+        return level.load_level()
 
     def init_ball(self, p_height, ball_radius):
         ball_start = (self.screen_width // 2, self.screen_height - (5 * p_height))
@@ -55,9 +82,8 @@ class GameWindow:
     def run(self):
         running = True
         pygame.mouse.set_visible(False)
-            
+        self.logger.debug("Started the GameWindow successfully")
         while running:
-            self.logger.debug("Started the GameWindow successfully")
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONUP:
                     self.logger.debug(f"Detected Mouse UP: len(self.balls)={len(self.balls)}, vel_x={self.balls[0].vel_x}, vel_y={self.balls[0].vel_y}")
@@ -75,7 +101,7 @@ class GameWindow:
             # Ball update
             for ball in self.balls:
                 ball.update_position()
-                pygame.draw.circle(self.screen,[255,0,0],ball.rect.center, ball.radius)
+                pygame.draw.circle(self.screen,self.default_ball_color,ball.rect.center, ball.radius)
 
             if ball.rect.colliderect(self.paddle.rect):
                 self.logger.debug(f"Paddle Hit: p{self.paddle.rect.centerx}, b{ball.rect.centerx}, s{ball.speed}")
@@ -85,11 +111,31 @@ class GameWindow:
                 ball.vel_y = v_new[1]
                 ball.rect.bottom = self.paddle.rect.top
 
+            new_bricks = []
+            for brick in self.bricks:
+                if ball.rect.colliderect(brick):
+                    cside = self.check_collision_side(ball.rect, brick)
+                    self.logger.debug(f"Brick hit on {cside}!")
+                    if cside in ['left', 'right']:
+                        ball.vel_x *= -1
+                    if cside in ['top', 'bottom']:
+                        ball.vel_y *= -1
+                else:
+                    new_bricks.append(brick)
+                pygame.draw.rect(self.screen, self.brick_color, brick)
+            self.bricks = new_bricks
+
             pygame.display.flip()
 
             self.balls = [b for b in self.balls if not b.handle_wall_collisions()]
             if not self.balls:
                 running = False
+            if not self.bricks:
+                self.logger.info(f'Completed level {self.current_level}')
+                self.current_level += 1
+                self.logger.info(f"Loading level {self.current_level}")
+                self.bricks = self.load_level(self.current_level)
+                self.balls = [self.init_ball(self.p_height, self.ball_radius)]
         
         pygame.mouse.set_visible(True)
         return "menu"

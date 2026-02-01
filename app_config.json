@@ -6,11 +6,12 @@
     },
     "game": {
         "background_color": [0,0,50],
+        "brick_color": [0,255,0],
         "paddle_color": [255,255,255],
         "default_ball_radius": 10
     },
     "logging": {
-        "level": "INFO",
+        "level": "DEBUG",
         "file": "blink-block-blitz.log"
     },
     "menu": {
