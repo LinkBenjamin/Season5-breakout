@@ -1,9 +1,11 @@
 import logging
 from pathlib import Path
 from pygame import Rect
+from core.brick import Brick
 
 class Level:
-    def __init__(self, level, screen_width, screen_height):
+    def __init__(self, level, screen_width, screen_height, config):
+        self.config = config
         self.logger = logging.getLogger(__class__.__name__)
         current_file = Path(__file__).resolve()
         self.project_root = current_file.parents[2]
@@ -13,7 +15,7 @@ class Level:
         self.height = screen_height
     
     def load_level(self):
-        rects = []
+        bricks = []
         data = []
 
         if not self.level_file.exists():
@@ -31,7 +33,9 @@ class Level:
 
         for i,row in enumerate(data):
             for j,col in enumerate(row):
-                if col == '1':
+                if col != '0': # 0 is a blank space, not a real brick
                     new_rect = Rect(j * brick_width, i * brick_height, brick_width - 2, brick_height - 2)
-                    rects.append(new_rect)
-        return rects
+                    new_brick = Brick(col, self.config)
+                    new_brick.place_brick(new_rect)
+                    bricks.append(new_brick)
+        return bricks
