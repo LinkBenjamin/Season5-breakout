@@ -136,6 +136,10 @@ class GameWindow:
                 self.logger.info(f"Loading level {self.current_level}")
                 self.bricks = self.load_level(self.current_level)
                 self.balls = [self.init_ball(self.p_height, self.ball_radius)]
+                if self.bricks is None:
+                    self.logger.debug("No new level found. Win Game Condition Met.")
+                    pygame.mouse.set_visible(True)
+                    return "WIN"
         
         pygame.mouse.set_visible(True)
         return "menu"
