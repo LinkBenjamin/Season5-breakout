@@ -8,6 +8,7 @@
         "background_color": [0,0,50],
         "brick_color": [0,255,0],
         "paddle_color": [255,255,255],
+        "split_color": [180,0,180],
         "default_ball_radius": 10
     },
     "logging": {

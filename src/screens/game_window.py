@@ -8,6 +8,7 @@ import random
 
 class GameWindow:
     def __init__(self, screen, config):
+        self.config = config
         self.screen = screen
         self.logger = logging.getLogger(self.__class__.__name__)
         self.background_color = config.get('game',{}).get('background_color',[0,0,0])
@@ -48,7 +49,7 @@ class GameWindow:
 
     def load_level(self, lev):
         self.current_level = lev
-        level = Level(lev,self.screen_width,self.screen_height)
+        level = Level(lev,self.screen_width,self.screen_height, self.config)
         return level.load_level()
 
     def init_ball(self, p_height, ball_radius):
@@ -113,16 +114,19 @@ class GameWindow:
 
             new_bricks = []
             for brick in self.bricks:
-                if ball.rect.colliderect(brick):
-                    cside = self.check_collision_side(ball.rect, brick)
+                if ball.rect.colliderect(brick.rect):
+                    cside = self.check_collision_side(ball.rect, brick.rect)
                     self.logger.debug(f"Brick hit on {cside}!")
                     if cside in ['left', 'right']:
                         ball.vel_x *= -1
                     if cside in ['top', 'bottom']:
                         ball.vel_y *= -1
+                    if 'splitter' in brick.brick_type:
+                        ball2 = Ball((ball.x,ball.y),(self.screen_width,self.screen_height),ball.radius,(ball.vel_x * -1 ,ball.vel_y))
+                        self.balls.append(ball2)
                 else:
                     new_bricks.append(brick)
-                pygame.draw.rect(self.screen, self.brick_color, brick)
+                pygame.draw.rect(self.screen, brick.brick_color, brick.rect)
             self.bricks = new_bricks
 
             pygame.display.flip()
